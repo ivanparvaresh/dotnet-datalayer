@@ -6,7 +6,7 @@
 		<PackageVersion>0.0.1</PackageVersion>
 
 		<Description>An abstraction for data-access-layer</Description>
-		<PackageOutputPath>./../.nupkg</PackageOutputPath>
+		<PackageOutputPath>./../../.nupkg</PackageOutputPath>
 
 		<IsPackable>true</IsPackable>
 		<Title>Dotnet.DataLayer</Title>
