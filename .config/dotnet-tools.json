@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-ef": {
+      "version": "3.1.0",
+      "commands": [
+        "dotnet-ef"
+      ]
+    },
+    "dotnet-tool-exec": {
+      "version": "2.0.2",
+      "commands": [
+        "execute"
+      ]
+    },
+    "minicover": {
+      "version": "3.0.6",
+      "commands": [
+        "minicover"
+      ]
+    },
+    "coverlet.console": {
+      "version": "1.6.0",
+      "commands": [
+        "coverlet"
+      ]
+    },
+    "dotnet-reportgenerator-globaltool": {
+      "version": "4.3.9",
+      "commands": [
+        "reportgenerator"
+      ]
+    }
+  }
+}

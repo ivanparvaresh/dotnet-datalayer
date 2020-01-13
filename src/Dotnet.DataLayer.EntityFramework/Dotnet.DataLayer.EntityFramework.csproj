@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<PackageId>Dotnet.DataLayer.EntityFramework</PackageId>
+		<PackageVersion>0.0.1</PackageVersion>
+
+		<Description>An implementation of EntityFramework for DataLayer</Description>
+		<PackageOutputPath>./../.nupkg</PackageOutputPath>
+
+		<IsPackable>true</IsPackable>
+		<Title>Dotnet.DataLayer.EntityFramework</Title>
+		<Authors>javadparvaresh@gmail.com</Authors>
+		<PackageDescription>An implementation of EntityFramework for DataLayer</PackageDescription>
+		<PackageTags>dotnet;database;abstraction</PackageTags>
+		<RepositoryUrl>https://github.com/javadparvaresh/dotnet-datalayer</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryBranch>master</RepositoryBranch>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+		<ProjectReference Include="./../Dotnet.DataLayer/Dotnet.DataLayer.csproj" />
+	</ItemGroup>
+
+</Project>
