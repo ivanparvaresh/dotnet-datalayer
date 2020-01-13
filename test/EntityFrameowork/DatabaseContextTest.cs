@@ -1,80 +1,77 @@
-using System;
 using Xunit;
-using Microsoft.EntityFrameworkCore;
+using System;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using Dotnet.DataLayer.EntityFramework;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Dotnet.DataLayer.Test.EntityFramework
 {
-    public class EfCoreSessionTest
+    public class DatabaseContextTest
     {
         [Fact]
         public void Constructor_Should_Check_Null_Values()
         {
-            Assert.Throws<ArgumentNullException>(() => new TestSession(null));
+            Assert.Throws<ArgumentNullException>(() => new TestDbContext(null));
         }
+
         [Fact]
-        public async void Should_Open_A_Transaction_On_Construction()
+        public async void BeginTransactionAsync_Should_Open_A_Transaction()
         {
             // Preparation
             var sqliteConnection = new SqliteConnection("DataSource=:memory:");
             sqliteConnection.Open();
 
             // EXECUTION
-            var dbContext = new TestDbContext(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options);
-            var session = new TestSession(dbContext);
+            var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options;
+            var dbContext = new TestDbContext(options);
+            await dbContext.BeginTransactionAsync();
 
             // ASSERTION
             Assert.NotNull(dbContext.Database.CurrentTransaction);
-            Assert.NotNull(session.Transaction);
+            Assert.NotNull(dbContext.Transaction);
 
             // Cleaning
-            await session.RollbackAsync();
+            await dbContext.RollbackAsync();
             sqliteConnection.Close();
         }
-
         [Fact]
-        public async void Should_Use_Open_A_Transaction_When_Transaction_Is_Already_Open()
+        public async void BeginTransactionAsync_Should_Throw_If_Already_Transaction_Has_Initiated()
         {
             // Preparation
             var sqliteConnection = new SqliteConnection("DataSource=:memory:");
             sqliteConnection.Open();
 
             // EXECUTION
-            var dbContext = new TestDbContext(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options);
-            var transaction = await dbContext.Database.BeginTransactionAsync();
-            var session = new TestSession(dbContext);
+            var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options;
+            var dbContext = new TestDbContext(options);
+            await dbContext.BeginTransactionAsync();
 
             // ASSERTION
-            Assert.NotNull(dbContext.Database.CurrentTransaction);
-            Assert.NotNull(session.Transaction);
-            Assert.Equal(transaction.TransactionId, session.Transaction.TransactionId);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => dbContext.BeginTransactionAsync());
 
             // Cleaning
-            await session.RollbackAsync();
+            await dbContext.RollbackAsync();
             sqliteConnection.Close();
         }
 
         [Fact]
-        public async void CommitTransaction_Should_Commit_A_Transaction()
+        public async void CommitAsync_Should_SaveChanges()
         {
             // Preparation
             var sqliteConnection = new SqliteConnection("DataSource=:memory:");
             sqliteConnection.Open();
-            var dbContext = new TestDbContext(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder()
-                .UseSqlite(sqliteConnection)
-                .UseLoggerFactory(new LoggerFactory())
-                .Options);
+            var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options;
+            var dbContext = new TestDbContext(options);
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
             dbContext.Database.Migrate();
-            var session = new TestSession(dbContext);
+            await dbContext.BeginTransactionAsync();
+
 
             // EXECUTION
-            session.Samples.Add(new SampleEntity() { UniqueId = Guid.Empty, Name = "Test" });
-            await session.CommitAsync();
+            dbContext.Samples.Add(new SampleEntity() { UniqueId = Guid.Empty, Name = "Test" });
+            await dbContext.CommitAsync();
 
             // ASSERTION
             var cmd = sqliteConnection.CreateCommand();
@@ -100,26 +97,45 @@ namespace Dotnet.DataLayer.Test.EntityFramework
             // Cleaning
             sqliteConnection.Close();
         }
-
         [Fact]
-        public async void RollbackTransaction_Should_Revert_Changes()
+        public async void CommitAsync_Should_Throws_If_No_Transaction_Initiated()
         {
             // Preparation
             var sqliteConnection = new SqliteConnection("DataSource=:memory:");
             sqliteConnection.Open();
-            var dbContext = new TestDbContext(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder()
-                .UseSqlite(sqliteConnection)
-                .UseLoggerFactory(new LoggerFactory())
-                .Options);
+            var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options;
+            var dbContext = new TestDbContext(options);
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
             dbContext.Database.Migrate();
 
-            var session = new TestSession(dbContext);
+
+            // EXECUTION AND ASSERTION
+            await Assert.ThrowsAsync<InvalidOperationException>(() => dbContext.CommitAsync());
+
+            // Cleaning
+            sqliteConnection.Close();
+        }
+
+
+        [Fact]
+        public async void RollbackAsync_Should_Revert_Changes()
+        {
+            // Preparation
+            var sqliteConnection = new SqliteConnection("DataSource=:memory:");
+            sqliteConnection.Open();
+            var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options;
+            var dbContext = new TestDbContext(options);
+            dbContext.Database.EnsureDeleted();
+            dbContext.Database.EnsureCreated();
+            dbContext.Database.Migrate();
+            await dbContext.BeginTransactionAsync();
+
+
 
             // EXECUTION
-            session.Samples.Add(new SampleEntity() { UniqueId = Guid.Empty, Name = "Test" });
-            await session.RollbackAsync();
+            dbContext.Samples.Add(new SampleEntity() { UniqueId = Guid.Empty, Name = "Test" });
+            await dbContext.RollbackAsync();
 
             // ASSERTION
             var cmd = sqliteConnection.CreateCommand();
@@ -133,73 +149,63 @@ namespace Dotnet.DataLayer.Test.EntityFramework
             // Cleaning
             sqliteConnection.Close();
         }
+
         [Fact]
-        public void Dispose_Should_Revert_Changes()
+        public async void RollbackAsync_Should_Throws_If_No_Transaction_Initiated()
         {
             // Preparation
             var sqliteConnection = new SqliteConnection("DataSource=:memory:");
             sqliteConnection.Open();
-            var dbContext = new TestDbContext(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder()
-                .UseSqlite(sqliteConnection)
-                .UseLoggerFactory(new LoggerFactory())
-                .Options);
+            var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options;
+            var dbContext = new TestDbContext(options);
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
             dbContext.Database.Migrate();
 
+
+            // EXECUTION AND ASSERTION
+            await Assert.ThrowsAsync<InvalidOperationException>(() => dbContext.RollbackAsync());
+
+            // Cleaning
+            sqliteConnection.Close();
+        }
+
+
+        [Fact]
+        public async void Dispose_Should_Revert_Changes()
+        {
+            // Preparation
+            var sqliteConnection = new SqliteConnection("DataSource=:memory:");
+            sqliteConnection.Open();
+            var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder().UseSqlite(sqliteConnection).Options;
+            var dbContext = new TestDbContext(options);
+            dbContext.Database.EnsureDeleted();
+            dbContext.Database.EnsureCreated();
+            dbContext.Database.Migrate();
+            await dbContext.BeginTransactionAsync();
+
             // EXECUTION
-            var session = new TestSession(dbContext);
-            session.Samples.Add(new SampleEntity() { Name = "TEST", UniqueId = Guid.NewGuid() });
-            session.Dispose();
+            dbContext.Samples.Add(new SampleEntity() { Name = "TEST", UniqueId = Guid.NewGuid() });
+            dbContext.Dispose();
 
             // ASSERTION
-            Assert.Throws<System.ObjectDisposedException>(() => session.Datasource.Database.ExecuteSqlRaw("SELECT 1"));
+            Assert.Throws<System.ObjectDisposedException>(() => dbContext.Database.ExecuteSqlRaw("SELECT 1"));
 
             // CLEANUP
             sqliteConnection.Close();
         }
-        [Fact]
-        public void Dispose_Should_Dispose_SessionObject()
-        {
-            // Preparation
-            var sqliteConnection = new SqliteConnection("DataSource=:memory:");
-            sqliteConnection.Open();
-            var dbContext = new TestDbContext(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder()
-                .UseSqlite(sqliteConnection)
-                .UseLoggerFactory(new LoggerFactory())
-                .Options);
-            dbContext.Database.EnsureDeleted();
-            dbContext.Database.EnsureCreated();
-            dbContext.Database.Migrate();
-
-            var session = new TestSession(dbContext);
-
-            // EXECUTION
-            session.Dispose();
-
-            // ASSERTION
-            Assert.Throws<System.ObjectDisposedException>(() => session.Datasource.Database.ExecuteSqlRaw("SELECT 1"));
-
-            // Cleanup
-            sqliteConnection.Close();
-        }
 
         //////////////////////////////////////////////////
-        private class TestDbContext : EfCoreDatasource
+        private class TestDbContext : DatabaseContext<TestDbContext>
         {
+            public DbSet<SampleEntity> Samples { get; private set; }
+
             public TestDbContext(DbContextOptions options) : base(options)
             { }
+
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 modelBuilder.ApplyConfiguration(new SampleEntityMapping());
-            }
-        }
-        private class TestSession : EfCoreSession<TestDbContext>
-        {
-            public DbSet<SampleEntity> Samples { get; private set; }
-            public TestSession(TestDbContext dbContext) : base(dbContext)
-            {
-                this.Samples = this.Datasource.Set<SampleEntity>();
             }
         }
         private class SampleEntity
