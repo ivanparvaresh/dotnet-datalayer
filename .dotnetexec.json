@@ -1,0 +1,15 @@
+{
+    "name": "dotnet-datalayer",
+    "env": {
+        "TEST_THRESHOLD": 90
+    },
+    "commands": {
+        "clean":[
+            "dotnet clean"
+        ],
+        "test": [
+            "dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=\"$PWD/test_result/coverage.xml\" /p:Threshold=$TEST_THRESHOLD /p:ThresholdType=line /p:ThresholdStat=total",
+            "dotnet reportgenerator \"-reports:$PWD/test_result/coverage.xml\" \"-targetdir:test_result/report\" -historydir:test_result/history "
+        ]
+    }
+}
