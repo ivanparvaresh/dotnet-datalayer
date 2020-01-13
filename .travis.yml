@@ -13,8 +13,9 @@ jobs:
       if: type = pull_request
       script:
         - dotnet restore
+        - dotnet tool restore
         - dotnet build -c Release
-        - dotnet test
+        - dotnet execute test
     - stage: publish
       if: branch = master AND type = push
       branch:
