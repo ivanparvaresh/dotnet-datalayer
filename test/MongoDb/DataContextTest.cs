@@ -274,6 +274,11 @@ namespace Dotnet.DataLayer.Test.MognoDb
             dbContext2.Dispose();
         }
 
+        [Fact]
+        public void OnModelCreating_Should_Have_Model_Builder()
+        {
+        }
+
         // Internal Classes
         private class TestDbContext : DatabaseContext<TestDbContext>
         {
@@ -298,9 +303,10 @@ namespace Dotnet.DataLayer.Test.MognoDb
                 return base.GetDatabase(options, client);
             }
 
-            protected override void OnModelCreating()
+            protected override void OnModelCreating(ModelBuilder builder)
             {
                 this.HasOnModelCreatingExecuted = true;
+                if (builder == null) throw new ArgumentNullException(nameof(builder));
             }
         }
         public class SampleEntity

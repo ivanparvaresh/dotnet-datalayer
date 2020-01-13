@@ -1,6 +1,7 @@
 using System;
 using MongoDB.Driver;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Dotnet.DataLayer.MongoDb
@@ -13,6 +14,7 @@ namespace Dotnet.DataLayer.MongoDb
         public IMongoClient Client { get; private set; }
         public IMongoDatabase Database { get; private set; }
         public IClientSessionHandle SessionHandler { get; private set; }
+        private readonly ModelBuilder modelBuilder;
 
         public DatabaseContext([NotNullAttribute] DbContextOptions options)
         {
@@ -20,7 +22,10 @@ namespace Dotnet.DataLayer.MongoDb
 
             this.Client = this.CreateClient(options);
             this.Database = this.GetDatabase(options, this.Client);
-            this.OnModelCreating();
+
+            // we should run model creation once
+            this.modelBuilder = new ModelBuilder();
+            this.OnModelCreating(modelBuilder);
         }
 
         protected internal virtual IMongoClient CreateClient(DbContextOptions options)
@@ -32,7 +37,7 @@ namespace Dotnet.DataLayer.MongoDb
             if (options.MongoUrl.DatabaseName == null) throw new ArgumentNullException(nameof(options.MongoUrl.DatabaseName));
             return client.GetDatabase(options.MongoUrl.DatabaseName);
         }
-        protected internal virtual void OnModelCreating()
+        protected internal virtual void OnModelCreating(ModelBuilder builder)
         { }
 
         public Task BeginTransactionAsync()
