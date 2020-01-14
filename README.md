@@ -9,52 +9,32 @@ install the library by using to following command:
 dotnet add package dotnet-datalayer --version 0.0.1
 ```
 
-Create Datasource:
+Create DataContext:
 ```csharp
 
 // EFCore
 using Dotnet.DataLayer.EntityFramework;
-public class MyDatasource : EfCoreDatasource{
+public class MyDataContext : DatabaseContext{
     public MyDatasource(DbContextOptions options) : base(options){}
 }
 
 // Mongo
 using Dotnet.DataLayer.MongoDb;
-public class MyDatasource : MongoDbDatasource{
-    public MyDatasource(MongoDbDatasourceOptions options) : base(options){}
-}
-```
-
-Create Session:
-```csharp
-
-// EFCore
-using Dotnet.DataLayer.EntityFramework;
-public class MySession : EfCoreSession<MyDatasource>{
-
-    public DbSet<MyEntity> Tests {get; private set;}
-
-    public MongoDbSession(MyDatasource datasource):base(datasource){}
-}
-
-// Mongo
-using Dotnet.DataLayer.MongoDb;
-public class MySession : MongoDbSession<MyDatasource>{
-
-    public IMongoCollection<MyEntity> Tests {get; private set;}
-
-    public MongoDbSession(MyDatasource datasource):base(datasource){}
+public class MyDataContext : DatabaseContext{
+    public MyDatasource(DbContextOptions options) : base(options){}
 }
 ```
 
 Register as service:
 ```csharp
 
-services.AddDatasource<MyDatasource,MySession>();
+services.AddDatabaseContext<MyDataContext>();
 
 public class Client {
 
-    public Client(MySession session){}
+    public Client(MyDataContext session){
+        
+    }
     
 }
 
