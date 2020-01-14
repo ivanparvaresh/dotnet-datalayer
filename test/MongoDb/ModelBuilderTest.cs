@@ -104,17 +104,17 @@ namespace Dotnet.DataLayer.Test.MognoDb
             public bool HasGetDatabaseExecuted { get; private set; }
             public IMongoCollection<SampleEntity> SampleEntities { get; private set; }
 
-            public TestDbContext(DbContextOptions options) : base(options)
+            public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
             {
                 this.SampleEntities = this.Database.GetCollection<SampleEntity>("SampleEntity");
             }
 
-            protected override IMongoClient CreateClient(DbContextOptions options)
+            protected override IMongoClient CreateClient(DbContextOptions<TestDbContext> options)
             {
                 this.HasCreateClientExecuted = true;
                 return base.CreateClient(options);
             }
-            protected override IMongoDatabase GetDatabase(DbContextOptions options, IMongoClient client)
+            protected override IMongoDatabase GetDatabase(DbContextOptions<TestDbContext> options, IMongoClient client)
             {
                 this.HasGetDatabaseExecuted = true;
                 return base.GetDatabase(options, client);

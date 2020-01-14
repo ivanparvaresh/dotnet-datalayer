@@ -1,7 +1,5 @@
 using Xunit;
 using System;
-using Mongo2Go;
-using System.Linq;
 using MongoDB.Driver;
 using Dotnet.DataLayer.MongoDb;
 
@@ -14,7 +12,14 @@ namespace Dotnet.DataLayer.Test.MognoDb
         [Fact]
         public void Constructor_Should_Check_Null_Values()
         {
-            Assert.Throws<ArgumentNullException>(() => new DbContextOptions(null));
+            Assert.Throws<ArgumentNullException>(() => new TestDbContextOptions(null));
+        }
+
+        // INTERNAL CLASESS
+        private class TestDbContextOptions : DbContextOptions
+        {
+            public TestDbContextOptions(MongoUrl mongoUrl) : base(mongoUrl)
+            { }
         }
     }
 }
