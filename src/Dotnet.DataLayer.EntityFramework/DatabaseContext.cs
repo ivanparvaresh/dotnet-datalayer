@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Dotnet.DataLayer.EntityFramework
 {
-    public class DatabaseContext<TDatabaseContext> : DbContext, IDatabaseContext<TDatabaseContext>
+    public class DatabaseContext<TDatabaseContext> : DbContext, IDatabaseContext<TDatabaseContext>, IDatabaseContext
         where TDatabaseContext : DatabaseContext<TDatabaseContext>,
                                  IDatabaseContext<TDatabaseContext>,
                                  IDatabaseContext
