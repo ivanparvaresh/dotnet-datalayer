@@ -5,7 +5,6 @@
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<PackageId>dotnet-datalayer-entityframework</PackageId>
-		<PackageVersion>0.0.2</PackageVersion>
 
 		<Description>An implementation of EntityFramework for DataLayer</Description>
 		<PackageOutputPath>./../../.nupkg</PackageOutputPath>
