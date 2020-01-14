@@ -13,8 +13,9 @@ jobs:
       if: type = pull_request
       script:
         - dotnet restore
+        - dotnet tool restore
         - dotnet build -c Release
-        - dotnet test
+        - dotnet execute test
     - stage: publish
       if: branch = master AND type = push
       branch:
@@ -24,4 +25,4 @@ jobs:
         - VERSION=${VERSION:-'0.0.0'}
         - dotnet restore
         - dotnet pack -c Release
-        - dotnet nuget push .nupkg/*.nupkg --api-key $NUGET_API_KEY --source $NUGET_SOURCE
+        - ls .nupkg/*.nupkg |  while read line ; do dotnet nuget push $line --api-key $NUGET_API_KEY --source $NUGET_SOURCE; done
