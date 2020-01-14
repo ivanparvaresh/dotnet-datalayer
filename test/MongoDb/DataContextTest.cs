@@ -28,7 +28,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public void Constructor_Should_Open_A_Connection_To_The_Database()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -53,7 +53,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public void Constructor_Should_Call_CreateClient()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
 
             // EXECUTION
             var dbContext = new TestDbContext(options);
@@ -68,7 +68,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public void Constructor_Should_Call_GetDatabase()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
 
             // EXECUTION
             var dbContext = new TestDbContext(options);
@@ -84,7 +84,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         {
             // PREPARATION
             var mongoUrl = new MongoUrl("mongodb://username:password@host:1234/test");
-            var options = new DbContextOptions(mongoUrl);
+            var options = new DbContextOptions<TestDbContext>(mongoUrl);
 
             // EXECUTION
             var dbContext = new TestDbContext(options);
@@ -97,7 +97,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public void GetDatabase_Should_Check_DatabaseName()
         {
             var mongoUrl = new MongoUrl("mongodb://username:password@host:1234");
-            var options = new DbContextOptions(mongoUrl);
+            var options = new DbContextOptions<TestDbContext>(mongoUrl);
             Assert.Throws<ArgumentNullException>(() => new TestDbContext(options));
         }
 
@@ -105,7 +105,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public async Task BeginTransactionAsync_Should_Open_A_Transaction()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -126,7 +126,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public async Task BeginTransactionAsync_Should_Throw_If_Already_Transaction_Initiated()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -147,7 +147,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public async Task CommitAsync_Should_Commit_The_Transaction()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -173,7 +173,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public async Task CommitAsync_Should_Throw_If_No_Transaction_Initiated()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -191,7 +191,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public async Task RollbackAsync_Should_Revert_The_Changes()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -213,7 +213,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public async Task RollbackAsync_Should_Throw_If_No_Transaction_Initiated()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -231,7 +231,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public void Dispose_Should_Dispose_All_Objects()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -250,7 +250,7 @@ namespace Dotnet.DataLayer.Test.MognoDb
         public async void Dispose_Should_Rolleback_And_Dispose_If_Transaction_Exists()
         {
             // PREPARATION
-            var options = new DbContextOptions(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
+            var options = new DbContextOptions<TestDbContext>(new MongoDB.Driver.MongoUrl(mongo2GoRunnerFixture.ConnectionString));
             var dbContext = new TestDbContext(options);
             dbContext.Database.DropCollection("SampleEntity");
             dbContext.Database.Client.DropDatabase("test");
@@ -287,17 +287,17 @@ namespace Dotnet.DataLayer.Test.MognoDb
             public bool HasGetDatabaseExecuted { get; private set; }
             public IMongoCollection<SampleEntity> SampleEntities { get; private set; }
 
-            public TestDbContext(DbContextOptions options) : base(options)
+            public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
             {
                 this.SampleEntities = this.Database.GetCollection<SampleEntity>("SampleEntity");
             }
 
-            protected override IMongoClient CreateClient(DbContextOptions options)
+            protected override IMongoClient CreateClient(DbContextOptions<TestDbContext> options)
             {
                 this.HasCreateClientExecuted = true;
                 return base.CreateClient(options);
             }
-            protected override IMongoDatabase GetDatabase(DbContextOptions options, IMongoClient client)
+            protected override IMongoDatabase GetDatabase(DbContextOptions<TestDbContext> options, IMongoClient client)
             {
                 this.HasGetDatabaseExecuted = true;
                 return base.GetDatabase(options, client);

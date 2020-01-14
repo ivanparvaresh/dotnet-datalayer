@@ -3,7 +3,7 @@ using MongoDB.Driver;
 
 namespace Dotnet.DataLayer.MongoDb
 {
-    public class DbContextOptions
+    public abstract class DbContextOptions
     {
         public MongoUrl MongoUrl { get; private set; }
 
@@ -11,5 +11,11 @@ namespace Dotnet.DataLayer.MongoDb
         {
             this.MongoUrl = mongoUrl ?? throw new ArgumentNullException(nameof(mongoUrl));
         }
+    }
+    public class DbContextOptions<TDbContext> : DbContextOptions
+        where TDbContext : DatabaseContext<TDbContext>
+    {
+        public DbContextOptions(MongoUrl mongoUrl) : base(mongoUrl)
+        { }
     }
 }
