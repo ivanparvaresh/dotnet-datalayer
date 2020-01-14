@@ -4,22 +4,12 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
-        public static IServiceCollection AddDatasource<TDatasource>(this IServiceCollection services)
-            where TDatasource : class, IDatasource
+        public static IServiceCollection AddDatabaseContext<TDatabaseContext>(this IServiceCollection services)
+            where TDatabaseContext : class, IDatabaseContext<TDatabaseContext>
         {
-            services.AddScoped<TDatasource>();
-            services.AddScoped<IDatasource>(p => p.GetService<TDatasource>());
-            return services;
-        }
-        public static IServiceCollection AddDatasource<TDatasource, TSession>(this IServiceCollection services)
-            where TDatasource : class, IDatasource
-            where TSession : class, ISession<TDatasource>
-        {
-            services.AddScoped<TDatasource>();
-            services.AddScoped<IDatasource>(p => p.GetService<TDatasource>());
-            services.AddScoped<TSession>();
-            services.AddScoped<ISession>(p => p.GetService<TSession>());
-            services.AddScoped<ISession<TDatasource>>(p => p.GetService<TSession>());
+            services.AddScoped<TDatabaseContext>();
+            services.AddScoped<IDatabaseContext>(p => p.GetService<TDatabaseContext>());
+            services.AddScoped<IDatabaseContext<TDatabaseContext>>(p => p.GetService<TDatabaseContext>());
             return services;
         }
     }
